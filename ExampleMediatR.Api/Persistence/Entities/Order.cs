@@ -3,7 +3,7 @@
 public class Order
 {
     public Guid Id { get; set; }
-    public Guid CustomerId { get; set; }
+    public Customer Customer { get; set; }
     public string ProductName { get; set; }
     public decimal Price { get; set; }
 }

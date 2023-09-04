@@ -12,8 +12,8 @@ public class CustomersConfiguration : IEntityTypeConfiguration<Customer>
 
         builder
             .HasMany(c => c.Orders)
-            .WithOne()
-            .HasForeignKey(c => c.CustomerId)
+            .WithOne(o => o.Customer)
+            .HasForeignKey(c => c.Customer.Id) // is it good? or maybe additional property 'CustomerId' in Order.cs
             .IsRequired(false);
     }
 }

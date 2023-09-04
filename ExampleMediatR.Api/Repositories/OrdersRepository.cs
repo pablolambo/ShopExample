@@ -20,7 +20,7 @@ namespace ExampleMediatR.Api.Repositories
             await _dbContext.Orders.AddAsync(order);
         }
 
-        public async Task<IActionResult> DeleteOrderAsync(Guid Id)
+        public async Task<ActionResult<Order>> DeleteOrderAsync(Guid Id)
         {
             var order = await _dbContext.FindAsync(Id);
             if (order == null)
@@ -39,9 +39,9 @@ namespace ExampleMediatR.Api.Repositories
 
         }
 
-        public void Save()
+        public async Task SaveAsync()
         {
-
+            await _dbContext.SaveChangesAsync();
         }
 
         public Task UpdateOrderAsync()

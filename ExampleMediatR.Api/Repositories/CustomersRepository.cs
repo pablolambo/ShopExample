@@ -1,5 +1,6 @@
 ﻿using ExampleMediatR.Api.Persistence;
 using ExampleMediatR.Api.Persistence.Entities;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ExampleMediatR.Api.Repositories;
 
@@ -12,32 +13,40 @@ public class CustomersRepository : ICustomersRepository
         _dbContext = dbContext;
     }
 
-    public Task CreateCustomerAsync(Customer customer)
+    public async Task CreateCustomerAsync(Customer customer)
+    {
+        _dbContext.Customers.Add(customer);
+        await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task DeleteCustomerAsync(Guid id)
+    {
+        
+        var customer = await _dbContext.Customers.FindAsync(id);
+        if (customer == null)
+            return ;
+
+        _dbContext.Customers.Remove(customer);
+        await _dbContext.SaveChangesAsync();
+        
+    }
+
+    public async Task<Customer> GetCustomerByIdAsync(Guid Id)
     {
 
     }
 
-    public Task DeleteCustomerAsync(Guid Id)
+    public async Task<IEnumerable<Customer>> GetCustomersAsync()
     {
 
     }
 
-    public Task<Customer> GetCustomerByIdAsync(Guid Id)
+    public async Task SaveAsync()
     {
-
+        await _dbContext.SaveChangesAsync();
     }
 
-    public Task<IEnumerable<Customer>> GetCustomersAsync()
-    {
-
-    }
-
-    public void Save()
-    {
-
-    }
-
-    public Task UpdateCustomerAsync()
+    public async Task UpdateCustomerAsync()
     {
 
     }

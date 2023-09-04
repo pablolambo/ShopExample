@@ -1,5 +1,6 @@
 ﻿namespace ExampleMediatR.Api.Controllers;
 
+using ExampleMediatR.Api.Persistence.Entities;
 using ExampleMediatR.Api.Persistence.Requests;
 using ExampleMediatR.Api.Repositories;
 using Microsoft.AspNetCore.Mvc;
@@ -10,13 +11,13 @@ public class OrdersController : ControllerBase
 {
     private readonly ILogger<OrdersController> _logger;
     private readonly IOrdersRepository _ordersRepository;
-    private readonly IMapper _mapper;
+    //private readonly IMapper _mapper;
 
-    public OrdersController(ILogger<OrdersController> logger, IOrdersRepository ordersRepository, IMapper mapper)
+    public OrdersController(ILogger<OrdersController> logger, IOrdersRepository ordersRepository/*, IMapper mapper*/)
     {
         _logger = logger;
         _ordersRepository = ordersRepository;
-        _mapper = mapper;
+        //_mapper = mapper;
     }
 
     [HttpGet("{id}")]
@@ -29,30 +30,38 @@ public class OrdersController : ControllerBase
             return NotFound();
         
         }
-        var orderResponse = _mapper.MapOrderDtoToOrderResponse(order);
+        //var orderResponse = _mapper.MapOrderDtoToOrderResponse(order);
         _logger.LogInformation($"Getting order with ID: {id}");
 
-        return Ok(orderResponse);
+        return Ok(order);
     }
 
     [HttpGet]
     public async Task<IActionResult> GetOrders()
     {
         var orders = await _ordersRepository.GetOrdersAsync();
-        var orderResponses = _mapper.MapOrdersDtosToOrderResponses(orders);
+        //var orderResponses = _mapper.MapOrdersDtosToOrderResponses(orders);
         _logger.LogInformation($"Getting all orders...");
 
-        return Ok(orderResponses);
+        return Ok(orders);
     }
 
     [HttpPost]
     public async Task<IActionResult> CreateOrder([FromBody] CreateCustomerOrderRequest request)
     {
-        var order = await _ordersRepository.CreateOrderAsync(request.Id, request.Name);
-        _logger.LogInformation($"Create order for customer id: {order.CustomerId} for product with ID: {order.Id}");
+        var orderToAdd = new Order
+        {
+            Id = Guid.NewGuid(),
+            ProductName = request.ProductName,
+            Price = request.Price,
+            Customer = request.Customer
+        };
+        //var orderResponse = _mapper.MapOrderDtoToCustomerResponse(order);
 
-        var orderResponse = _mapper.MapOrderDtoToCustomerResponse(order);
-        return CreatedAtAction("GetCustomer", new { Id = order.Id }, orderResponse);
+        await _ordersRepository.CreateOrderAsync(orderToAdd);
+        _logger.LogInformation($"Create order for customer id: {orderToAdd.CustomerId} for product with ID: {orderToAdd.Id}");
+
+        return Ok(orderToAdd);
     }
 
     [HttpDelete("{id}")]
@@ -66,7 +75,7 @@ public class OrdersController : ControllerBase
         }
 
         await _ordersRepository.DeleteOrderAsync(id);
-        _logger.LogInformation($"Deleted order with ID: {id}");
+        _logger.LogInformation($"Delete order with ID: {id}");
 
         return NoContent();
 
@@ -80,14 +89,16 @@ public class OrdersController : ControllerBase
         {
             return NotFound();
         }
-
+      
+        order.Customer = request.Customer;
         order.ProductName = request.ProductName;
         order.Price = request.Price;
 
-        await _ordersRepository.UpdateOrderAsync(order);
-        _logger.LogInformation($"Updated order with ID: {id}");
+        //var updatedOrderResponse = _mapper.MapOrderDtoToOrderResponse(order);
 
-        var updatedOrderResponse = _mapper.MapOrderDtoToOrderResponse(order);
-        return Ok(updatedOrderResponse);
+        await _ordersRepository.UpdateOrderAsync(order);
+        _logger.LogInformation($"Update order with ID: {id}");
+
+        return Ok(order);
     }
 }
