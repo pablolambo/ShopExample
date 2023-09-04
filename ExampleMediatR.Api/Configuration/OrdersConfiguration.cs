@@ -8,7 +8,7 @@ public class OrdersConfiguration : IEntityTypeConfiguration<Order>
 {
     public void Configure(EntityTypeBuilder<Order> builder)
     {
-        throw new NotImplementedException();
+        builder.HasKey(o => o.Id);
     }
 }
 

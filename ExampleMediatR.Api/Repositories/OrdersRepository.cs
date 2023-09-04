@@ -1,24 +1,32 @@
 ﻿using ExampleMediatR.Api.Configuration;
+using ExampleMediatR.Api.Persistence;
+using ExampleMediatR.Api.Persistence.Entities;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ExampleMediatR.Api.Repositories
 {
     public class OrdersRepository : IOrdersRepository
     {
-        private readonly OrdersConfiguration _dbContext;
+        private readonly ShopDbContext _dbContext;
 
-        public OrdersRepository(OrdersConfiguration dbContext)
+        public OrdersRepository(ShopDbContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        public Task CreateOrderAsync(Order order)
+        public async Task CreateOrderAsync(Order order)
         {
-
+            await _dbContext.Orders.AddAsync(order);
         }
 
-        public Task DeleteOrderAsync(Guid Id)
+        public async Task<IActionResult> DeleteOrderAsync(Guid Id)
         {
-
+            var order = await _dbContext.FindAsync(Id);
+            if (order == null)
+            {
+                return NotFound();
+            }
         }
 
         public Task<Order> GetOrderByIdAsync(Guid Id)

@@ -1,4 +1,6 @@
-﻿namespace ExampleMediatR.Api.Repositories;
+﻿using ExampleMediatR.Api.Persistence.Entities;
+
+namespace ExampleMediatR.Api.Repositories;
 
 public interface ICustomersRepository
 {

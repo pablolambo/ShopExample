@@ -1,5 +1,6 @@
 ﻿namespace ExampleMediatR.Api.Controllers;
 
+using ExampleMediatR.Api.Persistence.Requests;
 using ExampleMediatR.Api.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,20 +19,29 @@ public class OrdersController : ControllerBase
         _mapper = mapper;
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetOrder(Guid orderId)
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetOrder(Guid id)
     {
-        var order = await _ordersRepository.GetOrderAsync(orderId);
-        if (order == null) { return NotFound(); }
+        var order = await _ordersRepository.GetOrderByIdAsync(id);
+
+        if (order == null) 
+        {
+            return NotFound();
+        
+        }
         var orderResponse = _mapper.MapOrderDtoToOrderResponse(order);
+        _logger.LogInformation($"Getting order with ID: {id}");
+
         return Ok(orderResponse);
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllOrders()
+    public async Task<IActionResult> GetOrders()
     {
         var orders = await _ordersRepository.GetOrdersAsync();
         var orderResponses = _mapper.MapOrdersDtosToOrderResponses(orders);
+        _logger.LogInformation($"Getting all orders...");
+
         return Ok(orderResponses);
     }
 
@@ -43,5 +53,41 @@ public class OrdersController : ControllerBase
 
         var orderResponse = _mapper.MapOrderDtoToCustomerResponse(order);
         return CreatedAtAction("GetCustomer", new { Id = order.Id }, orderResponse);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteOrder(Guid id)
+    {
+        var order = await _ordersRepository.GetOrderByIdAsync(id);
+
+        if (order == null)
+        {
+            return NotFound();
+        }
+
+        await _ordersRepository.DeleteOrderAsync(id);
+        _logger.LogInformation($"Deleted order with ID: {id}");
+
+        return NoContent();
+
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateOrder(Guid id, [FromBody] UpdateCustomerOrderRequest request)
+    {
+        var order = await _ordersRepository.GetOrderByIdAsync(id);
+        if(order == null)
+        {
+            return NotFound();
+        }
+
+        order.ProductName = request.ProductName;
+        order.Price = request.Price;
+
+        await _ordersRepository.UpdateOrderAsync(order);
+        _logger.LogInformation($"Updated order with ID: {id}");
+
+        var updatedOrderResponse = _mapper.MapOrderDtoToOrderResponse(order);
+        return Ok(updatedOrderResponse);
     }
 }

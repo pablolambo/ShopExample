@@ -1,10 +1,13 @@
-﻿namespace ExampleMediatR.Api.Repositories;
+﻿using ExampleMediatR.Api.Persistence;
+using ExampleMediatR.Api.Persistence.Entities;
+
+namespace ExampleMediatR.Api.Repositories;
 
 public class CustomersRepository : ICustomersRepository
 {
-    private readonly ExampleDbContext _dbContext;
+    private readonly ShopDbContext _dbContext;
 
-    public CustomersRepository(ExampleDbContext dbContext)
+    public CustomersRepository(ShopDbContext dbContext)
     {
         _dbContext = dbContext;
     }
