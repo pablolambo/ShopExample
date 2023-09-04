@@ -59,7 +59,7 @@ public class OrdersController : ControllerBase
         //var orderResponse = _mapper.MapOrderDtoToCustomerResponse(order);
 
         await _ordersRepository.CreateOrderAsync(orderToAdd);
-        _logger.LogInformation($"Create order for customer id: {orderToAdd.CustomerId} for product with ID: {orderToAdd.Id}");
+        _logger.LogInformation($"Create order for customer id: {orderToAdd.Customer.Id} for product with ID: {orderToAdd.Id}");
 
         return Ok(orderToAdd);
     }

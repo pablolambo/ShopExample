@@ -10,6 +10,5 @@ public interface IOrdersRepository
     Task CreateOrderAsync(Order order);
     Task UpdateOrderAsync(Order order);
     Task DeleteOrderAsync(Guid Id);
-    Task SaveAsync();
 }
 

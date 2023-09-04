@@ -3,6 +3,7 @@ using ExampleMediatR.Api.Persistence;
 using ExampleMediatR.Api.Persistence.Entities;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ExampleMediatR.Api.Repositories
 {
@@ -18,35 +19,33 @@ namespace ExampleMediatR.Api.Repositories
         public async Task CreateOrderAsync(Order order)
         {
             await _dbContext.Orders.AddAsync(order);
-        }
-
-        public async Task<ActionResult<Order>> DeleteOrderAsync(Guid Id)
-        {
-            var order = await _dbContext.FindAsync(Id);
-            if (order == null)
-            {
-                return NotFound();
-            }
-        }
-
-        public Task<Order> GetOrderByIdAsync(Guid Id)
-        {
-
-        }
-
-        public Task<IEnumerable<Order>> GetOrdersAsync()
-        {
-
-        }
-
-        public async Task SaveAsync()
-        {
             await _dbContext.SaveChangesAsync();
         }
 
-        public Task UpdateOrderAsync()
+        public async Task DeleteOrderAsync(Guid id)
         {
+            var order = await _dbContext.Orders.FindAsync(id);
+            _dbContext.Orders.Remove(order);
+            await _dbContext.SaveChangesAsync();
 
+        }
+
+        public async Task<Order> GetOrderByIdAsync(Guid id)
+        {
+            var order = await _dbContext.Orders.FindAsync(id);
+            return order;
+        }
+
+        public async Task<IEnumerable<Order>> GetOrdersAsync()
+        {
+            var orders = await _dbContext.Orders.ToListAsync();
+            return orders;
+        }
+
+        public async Task UpdateOrderAsync(Order order)
+        {
+            _dbContext.Orders.Update(order);
+            await _dbContext.SaveChangesAsync();
         }
     }
 }
